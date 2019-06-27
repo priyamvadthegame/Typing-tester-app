@@ -5,15 +5,27 @@ var originalText = document.querySelector(".text-section-div p").innerHTML;
 var resetButton = document.querySelector("#reset");
 var theTimer = document.querySelector(".timer");
 var cong=document.querySelector(".cong-section");
+var  Word_count=document.querySelector(".word-count");
+var  Error=document.querySelector(".error");
+var  Speed=document.querySelector(".speed");
 var timer =0;
 var minutes=0;
 var seconds=0;
 var milliseconds=0;
+var Word_Count="";
+var speed_Count=0.0;
 var currentTime="";
+var ErrorCount=0;
+var WordCount=1;
 var interval=0;
+var flag_index=0;
+var textenterd="";
+var partialtext="";
+var errors=0;
+var flag1=0;
 var timerRunning=false;
-var arr=["Between what is said and not meant, and what is meant and not said, most of love is lost.",
-         "Find what you love and let it kill you.",
+var arr=["Between what said is said and not meant, and what is meant and not said, most of love is lost.",
+         "I and and you.",
          "Despite everything, I believe that people are really good at heart.",
          "If you live to be 100, I hope I live to be 100 minus 1 day, so I never have to live without you.",
          "Nobody realises that some people expend tremendous energy merely to be normal.",
@@ -51,48 +63,95 @@ function startTimer() {
 // Match the text entered with the provided text on the page:
 function spellcheck() {
     originalText = document.querySelector(".text-section-div p").innerHTML;
-    var textenterd=textArea.value;
-    var partialtext=originalText.substring(0,textenterd.length);
+     textenterd=textArea.value;
+     partialtext=originalText.substring(0,textenterd.length);
     if(textenterd===originalText)
-    {
+    {   flag1=0;
+        flag_index=0;
+        Word_count.innerHTML=("Word Count "+WordCount++).bold();
+        if(seconds===0)
+        {
+            speed_Count=milliseconds/60000;
+        }
+        else if(minutes=0)
+        {
+            speed_Count=(seconds/60)+(milliseconds/60000);
+        }
+        else
+        {
+            speed_Count=minutes+(seconds/60)+(milliseconds/60000);
+        }
+        Speed.innerHTML=("Speed "+Math.ceil((WordCount/(speed_Count))).toString()+" Words Per Minute").bold();
+
         textAreaBorder.style.borderColor='forestgreen';
         clearInterval(interval);
         cong.style.display='block'
+
     }
     else if(textenterd===partialtext)
     {
         textAreaBorder.style.borderColor='darkblue';
+        flag1=0;
     }
     else
-    {
+    {   if(flag1==0) {
+        errors++;
+        }
+        ErrorCount="Error: "+errors;
+        Error.innerHTML=ErrorCount.bold();
+        flag1=1;
         textAreaBorder.style.borderColor='darkred';
     }
+
 }
+
 
 
 
 // Start the timer:
 function start() {
     var textEnteredlength=textArea.value.length;
+    var text=textArea.value;
+
     if(textEnteredlength===0)
     {
            interval=setInterval(startTimer,10);
            timerRunning=true;
     }
 
-spellcheck();
+    spellcheck();
+
+    if(originalText.charAt(textEnteredlength)===" "&&(textEnteredlength!=originalText.length)&&(text.charAt(textEnteredlength-1)!=" ")&&(flag_index<textEnteredlength))
+    {   flag_index=textEnteredlength;
+        Word_count.innerHTML=("Word Count "+WordCount++).bold();
+        if(seconds===0)
+        {
+            speed_Count=milliseconds/60000;
+        }
+        else if(minutes=0)
+        {
+            speed_Count=(seconds/60)+(milliseconds/60000);
+        }
+        else
+        {
+            speed_Count=minutes+(seconds/60)+(milliseconds/60000);
+        }
+        Speed.innerHTML=("Speed "+Math.ceil((WordCount/(speed_Count))).toString()+" Words Per Minute").bold();
+
+    }
+
 }
-
-
-
 // Reset everything:
 function reset() {
     clearInterval(interval);
     var random=Math.floor(Math.random()*7);
     o.innerHTML=arr[random];
+    flag_index=0;
     timer =0;
     minutes=0;
     seconds=0;
+    errors=0;
+    WordCount=1;
     milliseconds=0;
     currentTime="";
     interval=0;
@@ -101,6 +160,11 @@ function reset() {
     textArea.value='';
     textAreaBorder.style.borderColor='gray'
     cong.style.display='none'
+    ErrorCount="Error: "+errors;
+    Error.innerHTML=ErrorCount.bold();
+    Word_Count="Word Count "+"0";
+    Word_count.innerHTML=Word_Count.bold();
+    Speed.innerHTML="Speed: 0".bold();
 }
 // Event listeners for keyboard input and the reset button:
 textArea.addEventListener('keypress',start);
